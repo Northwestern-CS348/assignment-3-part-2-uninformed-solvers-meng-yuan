@@ -34,7 +34,43 @@ class TowerOfHanoiGame(GameMaster):
             A Tuple of Tuples that represent the game state
         """
         ### student code goes here
-        pass
+        list1 = []
+        list2 = []
+        list3 = []
+        list = ()
+        list_of_bindings1 = self.kb.kb_ask(parse_input('fact: on ?disk peg1)'))
+        if list_of_bindings1 == False:
+            pass
+        else:
+            for x in list_of_bindings1:
+                a = x.bindings[0].constant.element[4]
+                list1.append(int(a))
+        #print(list1)
+
+        list_of_bindings2 = self.kb.kb_ask(parse_input('fact: on ?disk peg2)'))
+        if list_of_bindings2 == False:
+            pass
+        else:
+            for x in list_of_bindings2:
+                b = x.bindings[0].constant.element[4]
+                list2.append(int(b))
+        #print(list2)
+
+        list_of_bindings3 = self.kb.kb_ask(parse_input('fact: on ?disk peg3)'))
+        if list_of_bindings3 == False:
+            pass
+        else:
+            for x in list_of_bindings3:
+                c = x.bindings[0].constant.element[4]
+                list3.append(int(c))
+        list1.sort()
+        list2.sort()
+        list3.sort()
+
+        list = (tuple(list1),tuple(list2),tuple(list3))
+        return list
+
+
 
     def makeMove(self, movable_statement):
         """
@@ -53,7 +89,51 @@ class TowerOfHanoiGame(GameMaster):
             None
         """
         ### Student code goes here
-        pass
+        move = movable_statement.terms
+
+        if str(movable_statement.terms[1]) == 'peg1':
+            a = 0
+        elif str(movable_statement.terms[1]) == 'peg2':
+            a = 1
+        else:
+            a = 2
+
+        if str(movable_statement.terms[2]) == 'peg1':
+            b = 0
+        elif str(movable_statement.terms[2]) == 'peg2':
+            b = 1
+        else:
+            b = 2
+
+        oldstate = self.getGameState()
+        # retract target peg empty & assert disk top & retract original disk top
+        self.kb.kb_retract(parse_input('fact: (empty ' + str(move[2]) + ')'))
+        self.kb.kb_assert(parse_input('fact: (top ' + str(move[0]) + ' ' + str(move[2])+')'))
+        self.kb.kb_assert(parse_input('fact: (on ' + str(move[0]) + ' ' + str(move[2])+')'))
+        self.kb.kb_retract(parse_input('fact: (top ' + str(move[0]) + ' ' + str(move[1]) + ')'))
+        self.kb.kb_retract(parse_input('fact: (on ' + str(move[0]) + ' ' + str(move[1]) + ')'))
+
+        # for current peg
+        if len(oldstate[a]) == 1:
+            self.kb.kb_assert(parse_input('fact: (empty ' + str(move[1]) + ')'))
+        else:
+            self.kb.kb_assert(parse_input('fact: (top disk' + str(oldstate[a][1]) + ' ' + str(move[1]) + ')'))
+
+        # for target peg
+        if oldstate[b] == ():
+            pass
+        else:
+            self.kb.kb_retract(parse_input('fact: top disk' + str(oldstate[b][0]) + ' ' + str(move[2]) + ')'))
+        '''
+        print("game state")
+        currentstate = self.getGameState()
+        print(".......")
+        print("test make move")
+        print(str(currentstate))
+        print(".......")
+        '''
+        return
+
 
     def reverseMove(self, movable_statement):
         """
@@ -100,7 +180,21 @@ class Puzzle8Game(GameMaster):
             A Tuple of Tuples that represent the game state
         """
         ### Student code goes here
-        pass
+
+        list = [[0,0,0],[0,0,0],[0,0,0]]
+        list_of_bindings = self.kb.kb_ask(parse_input("fact: (at ?tile ?x ?y"))
+        for i in range(0,len(list_of_bindings)):
+            tile = list_of_bindings[i]['?tile'][-1]
+            x = int(list_of_bindings[i]['?x'][-1])-1
+            y = int(list_of_bindings[i]['?y'][-1])-1
+            if tile == 'y':
+                list[y][x] = -1
+            else:
+                list[y][x] = int(tile)
+        list = (tuple(list[0]),tuple(list[1]),tuple(list[2]))
+        return list
+
+
 
     def makeMove(self, movable_statement):
         """
@@ -119,7 +213,26 @@ class Puzzle8Game(GameMaster):
             None
         """
         ### Student code goes here
-        pass
+        # (movable ?tile ?x0 ?y0 ?x ?y)
+        # fact: (at ?tile ?x ?y)
+
+        tile = str(movable_statement.terms[0])[-1]
+        x0 = str(movable_statement.terms[1])[-1]
+        y0 = str(movable_statement.terms[2])[-1]
+        x = str(movable_statement.terms[3])[-1]
+        y = str(movable_statement.terms[4])[-1]
+        oldlocation = parse_input('fact: (at tile' + str(tile) + ' pos' + x0 + ' pos' + y0 + ')' )
+        newlocation = parse_input('fact: (at tile' + str(tile) + ' pos' + x + ' pos' + y + ')')
+        oldempty = parse_input('fact: (at empty pos' + x + ' pos' + y)
+        newempty = parse_input('fact: (at empty pos' + x0 + ' pos' + y0)
+        self.kb.kb_retract(oldlocation)
+        self.kb.kb_retract(oldempty)
+        self.kb.kb_assert(newlocation)
+        self.kb.kb_assert(newempty)
+
+
+
+
 
     def reverseMove(self, movable_statement):
         """
