@@ -28,17 +28,6 @@ class SolverDFS(UninformedSolver):
         currentstate = self.currentState
         moves = self.gm.getMovables()
         children = self.gm.getMovables()
-        '''
-        print ("CURRENTSTATE" + str(self.currentState.state))
-        print ("MOVABLES:")
-        if moves:
-            for m in moves:
-                print (str(m))
-        print ("CHILDINDEX:")
-        print (currentstate.nextChildToVisit)
-        print ("*********")
-        '''
-
 
         if self.currentState.state == self.victoryCondition:
             return True
@@ -173,47 +162,7 @@ class SolverBFS(UninformedSolver):
             move = p.requiredMovable
             self.gm.makeMove(move)
 
-        '''
-        if self.currentState.state == self.victoryCondition:
-            return True
 
-        if self.currentState.depth == 0:
-            self.path[self.currentState] = []
-
-            # Add all possible moves that can be taken from the given state to the states list of children
-        posmoves = self.gm.getMovables()
-        curr = self.currentState
-        self.visited[curr] = True
-
-        # add children
-        if posmoves:
-            for move in posmoves:
-                self.gm.makeMove(move)
-                child_state = GameState(self.gm.getGameState(), curr.depth + 1, move)
-                if child_state not in self.visited:
-                    self.visited[child_state] = True
-                    self.Q.put(child_state)
-                    self.path[child_state] = self.path[curr].copy()
-                    self.path[child_state].append(child_state)
-                self.gm.reverseMove(move)
-
-        path_to_root = self.path[self.currentState]
-        path_to_root.reverse()
-        self.currentState = self.Q.get()
-        path_to_next = self.path[self.currentState]
-
-        for n in path_to_root:
-            self.gm.reverseMove(n.requiredMovable)
-
-        for p in path_to_next:
-            self.gm.makeMove(p.requiredMovable)
-            print(self.gm.getGameState())
-
-        if self.currentState.state == self.victoryCondition:
-            return True
-
-        return False
-        '''
 
 
 
